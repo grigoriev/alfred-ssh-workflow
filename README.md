@@ -1,5 +1,9 @@
 # Alfred SSH Workflow
 
+![CI](https://github.com/grigoriev/alfred-ssh-workflow/actions/workflows/ci.yml/badge.svg)
+[![Release](https://img.shields.io/github/v/release/grigoriev/alfred-ssh-workflow)](https://github.com/grigoriev/alfred-ssh-workflow/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An [Alfred](https://www.alfredapp.com/) workflow that lists the hosts from your
 `~/.ssh/config` and opens an SSH session in iTerm2.
 
