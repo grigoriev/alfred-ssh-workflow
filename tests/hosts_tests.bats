@@ -22,34 +22,34 @@ Host bastion
 EOF
 }
 
-@test "sshHosts: parses alias, hostname, user and port" {
-  run sshHosts "$CFG"
+@test "ssh_hosts: parses alias, hostname, user and port" {
+  run ssh_hosts "$CFG"
   echo "$output" | jq -e '.[] | select(.alias=="web")
     | .hostname=="web.example.com" and .user=="deploy" and .port=="2222"' >/dev/null
 }
 
-@test "sshHosts: expands multiple aliases on one Host line" {
-  run sshHosts "$CFG"
+@test "ssh_hosts: expands multiple aliases on one Host line" {
+  run ssh_hosts "$CFG"
   echo "$output" | jq -e 'map(.alias) | index("db1") != null and index("db2") != null' >/dev/null
   echo "$output" | jq -e '.[] | select(.alias=="db1") | .hostname=="10.0.0.5"' >/dev/null
 }
 
-@test "sshHosts: skips wildcard and negated patterns" {
-  run sshHosts "$CFG"
+@test "ssh_hosts: skips wildcard and negated patterns" {
+  run ssh_hosts "$CFG"
   echo "$output" | jq -e 'all(.[]; .alias | test("[*?!]") | not)' >/dev/null
 }
 
-@test "sshHosts: keys are case-insensitive (Hostname)" {
-  run sshHosts "$CFG"
+@test "ssh_hosts: keys are case-insensitive (Hostname)" {
+  run ssh_hosts "$CFG"
   echo "$output" | jq -e '.[] | select(.alias=="bastion") | .hostname=="bastion.example.com"' >/dev/null
 }
 
-@test "sshHosts: missing config yields an empty array" {
-  run sshHosts "$BATS_TEST_TMPDIR/nope"
+@test "ssh_hosts: missing config yields an empty array" {
+  run ssh_hosts "$BATS_TEST_TMPDIR/nope"
   [ "$output" == "[]" ]
 }
 
-@test "sshHosts: expands Include directives" {
+@test "ssh_hosts: expands Include directives" {
   mkdir -p "$BATS_TEST_TMPDIR/conf.d"
   cat > "$BATS_TEST_TMPDIR/conf.d/extra" <<'EOF'
 Host included
@@ -60,6 +60,6 @@ Include $BATS_TEST_TMPDIR/conf.d/*
 Host local
   HostName localhost
 EOF
-  run sshHosts "$BATS_TEST_TMPDIR/main"
+  run ssh_hosts "$BATS_TEST_TMPDIR/main"
   echo "$output" | jq -e 'map(.alias) | index("included") != null and index("local") != null' >/dev/null
 }
