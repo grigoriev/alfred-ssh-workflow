@@ -7,6 +7,7 @@
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": false,
+  "pinDigests": true,
   "packageRules": [
     {
       "matchUpdateTypes": [
