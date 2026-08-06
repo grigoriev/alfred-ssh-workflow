@@ -1,0 +1,5 @@
+#!/bin/bash
+# Mock osascript. Records its arguments to OSASCRIPT_LOG when set, so tests can
+# assert which SSH host was opened.
+[ -n "$OSASCRIPT_LOG" ] && printf '%s ' "$@" >> "$OSASCRIPT_LOG"
+exit 0
