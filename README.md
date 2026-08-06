@@ -3,6 +3,8 @@
 ![CI](https://github.com/grigoriev/alfred-ssh-workflow/actions/workflows/ci.yml/badge.svg)
 [![Release](https://img.shields.io/github/v/release/grigoriev/alfred-ssh-workflow)](https://github.com/grigoriev/alfred-ssh-workflow/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=coverage)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
 
 An [Alfred](https://www.alfredapp.com/) workflow that lists the hosts from your
 `~/.ssh/config` and opens an SSH session in iTerm2.
