@@ -42,33 +42,28 @@ fi
 
 HOSTS=$(sshHosts)
 
-if [ "$(jq 'length' <<< "$HOSTS")" == "0" ]; then
+# Filter and format every host in a single jq pass. Spawning jq once, rather
+# than several times per host, keeps the Script Filter instant even with
+# hundreds of hosts. The subtitle is "ssh user@hostname:port", each part
+# optional, falling back to the alias when there is no hostname.
+ITEMS=$(jq -c --arg q "$QUERY" --arg icon "$ICON_SSH" '
+  def target:
+    "ssh "
+    + (if .user != "" then .user + "@" else "" end)
+    + (if .hostname != "" then .hostname else .alias end)
+    + (if .port != "" then ":" + .port else "" end);
+  def hit($q): $q == "" or
+    (([.alias, .hostname, .user] | join(" ") | ascii_downcase)
+      | contains($q | ascii_downcase));
+  [ .[]
+    | select(hit($q))
+    | { uid: .alias, title: .alias, arg: .alias, valid: true,
+        icon: { path: $icon }, subtitle: target } ]' <<< "$HOSTS")
+
+if [ "$ITEMS" == "[]" ] && [ "$HOSTS" == "[]" ]; then
   addResult "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_SSH" "no"
   getJSONResults
   exit
 fi
 
-# Render each host, filtered by the query (case-insensitive substring over the
-# alias, hostname and user).
-shopt -s nocasematch
-while IFS= read -r HOST; do
-  [ -z "$HOST" ] && continue
-  ALIAS=$(jq -r '.alias' <<< "$HOST")
-  HOSTNAME=$(jq -r '.hostname // ""' <<< "$HOST")
-  USER=$(jq -r '.user // ""' <<< "$HOST")
-  PORT=$(jq -r '.port // ""' <<< "$HOST")
-
-  if [ -n "$QUERY" ] && [[ "$ALIAS $HOSTNAME $USER" != *"$QUERY"* ]]; then
-    continue
-  fi
-
-  # subtitle: user@hostname:port, falling back to the alias
-  TARGET="$HOSTNAME"
-  [ -z "$TARGET" ] && TARGET="$ALIAS"
-  [ -n "$USER" ] && TARGET="$USER@$TARGET"
-  [ -n "$PORT" ] && TARGET="$TARGET:$PORT"
-
-  addResult "$ALIAS" "$ALIAS" "$ALIAS" "ssh $TARGET" "$ICON_SSH"
-done <<< "$(jq -c '.[]' <<< "$HOSTS")"
-
-getJSONResults
+printf '{"items":%s}\n' "$ITEMS"
