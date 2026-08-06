@@ -47,20 +47,9 @@ hosts=$(ssh_hosts)
 # Filter and format every host in a single jq pass. Spawning jq once, rather
 # than several times per host, keeps the Script Filter instant even with
 # hundreds of hosts. The subtitle is "ssh user@hostname:port", each part
-# optional, falling back to the alias when there is no hostname.
-items=$(jq -c --arg q "$query" --arg icon "$ICON_SSH" '
-  def target:
-    "ssh "
-    + (if .user != "" then .user + "@" else "" end)
-    + (if .hostname != "" then .hostname else .alias end)
-    + (if .port != "" then ":" + .port else "" end);
-  def hit($q): $q == "" or
-    (([.alias, .hostname, .user] | join(" ") | ascii_downcase)
-      | contains($q | ascii_downcase));
-  [ .[]
-    | select(hit($q))
-    | { uid: .alias, title: .alias, arg: .alias, valid: true,
-        icon: { path: $icon }, subtitle: target } ]' <<< "$hosts")
+# optional, falling back to the alias when there is no hostname. The jq
+# program lives in src/list-hosts.jq so the shell logic stays small.
+items=$(jq -c -f src/list-hosts.jq --arg q "$query" --arg icon "$ICON_SSH" <<< "$hosts")
 
 if [[ "$items" == "[]" ]] && [[ "$hosts" == "[]" ]]; then
   add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_SSH" "no"
