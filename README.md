@@ -54,5 +54,7 @@ time and bundles it, so it is never stored in this repository.
 
 ## Releases
 
-Pushing a `v*` tag builds `SSH.alfredworkflow` and publishes a GitHub Release
-with the asset attached. The tag also sets the workflow version.
+Run the **Bump Version & Release** workflow from the Actions tab and pick
+`patch`, `minor` or `major`. It bumps the version, tags it, and the release
+workflow builds `SSH.alfredworkflow` and publishes a GitHub Release with the
+asset attached. Pushing a `v*` tag by hand does the same.
