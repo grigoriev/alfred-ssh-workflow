@@ -63,3 +63,29 @@ EOF
   run ssh_hosts "$BATS_TEST_TMPDIR/main"
   echo "$output" | jq -e 'map(.alias) | index("included") != null and index("local") != null' >/dev/null
 }
+
+@test "ssh_hosts: expands a tilde Include path" {
+  mkdir -p "$BATS_TEST_TMPDIR/home/.ssh/conf.d"
+  cat > "$BATS_TEST_TMPDIR/home/.ssh/conf.d/extra" <<'EOF'
+Host tildehost
+  HostName t.example.com
+EOF
+  cat > "$BATS_TEST_TMPDIR/main" <<'EOF'
+Include ~/.ssh/conf.d/*
+EOF
+  HOME="$BATS_TEST_TMPDIR/home" run ssh_hosts "$BATS_TEST_TMPDIR/main"
+  echo "$output" | jq -e 'map(.alias) | index("tildehost") != null' >/dev/null
+}
+
+@test "ssh_hosts: expands a relative Include path" {
+  mkdir -p "$BATS_TEST_TMPDIR/conf.d"
+  cat > "$BATS_TEST_TMPDIR/conf.d/rel" <<'EOF'
+Host relhost
+  HostName r.example.com
+EOF
+  cat > "$BATS_TEST_TMPDIR/main" <<'EOF'
+Include conf.d/rel
+EOF
+  run ssh_hosts "$BATS_TEST_TMPDIR/main"
+  echo "$output" | jq -e 'map(.alias) | index("relhost") != null' >/dev/null
+}

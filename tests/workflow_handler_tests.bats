@@ -79,3 +79,59 @@ setup() {
   run get_pref "db" 1
   [ "$output" == "10.0.0.5" ]
 }
+
+@test "add_result: ARG_PREFIX prefixes a cmd modifier arg" {
+  ARG_PREFIX="ssh "
+  add_result "u" "web" "Web" "sub" "i.png" "yes" "" "run as root" "root@web"
+  run get_json_results
+  echo "$output" | jq -e '.items[0].mods.cmd.arg == "ssh root@web"' >/dev/null
+  echo "$output" | jq -e '.items[0].mods.cmd.subtitle == "run as root"' >/dev/null
+}
+
+@test "get_json_results: multiple variables are comma-separated" {
+  add_variable "a" "1"
+  add_variable "b" "2"
+  run get_json_results
+  echo "$output" | jq -e '.variables.a == "1" and .variables.b == "2"' >/dev/null
+}
+
+@test "get_json_results: multiple results are comma-separated" {
+  add_result "u1" "a1" "T1" "s1" "i.png" "yes"
+  add_result "u2" "a2" "T2" "s2" "i.png" "yes"
+  run get_json_results
+  echo "$output" | jq -e '(.items | length) == 2' >/dev/null
+}
+
+@test "set_pref and get_pref: non-volatile store in the data dir" {
+  set_pref "token" "abc" 0
+  [ -f "$alfred_workflow_data/settings" ]
+  run get_pref "token" 0
+  [ "$output" == "abc" ]
+}
+
+@test "set_pref and get_pref: custom filename" {
+  set_pref "k" "v" 1 "hosts"
+  [ -f "$alfred_workflow_cache/hosts" ]
+  run get_pref "k" 1 "hosts"
+  [ "$output" == "v" ]
+}
+
+@test "set_pref: updates an existing key in place" {
+  set_pref "host" "old" 1
+  set_pref "host" "new" 1
+  run get_pref "host" 1
+  [ "$output" == "new" ]
+  run grep -c '^host=' "$alfred_workflow_cache/settings"
+  [ "$output" == "1" ]
+}
+
+@test "get_pref: missing data dir yields empty" {
+  run get_pref "anything" 0
+  [ "$output" == "" ]
+}
+
+@test "get_pref: missing file yields empty" {
+  mkdir -p "$alfred_workflow_cache"
+  run get_pref "nope" 1
+  [ "$output" == "" ]
+}

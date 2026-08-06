@@ -35,32 +35,9 @@ expand_ssh_config() {
 }
 
 # Turn ssh config text on stdin into a JSON array of hosts.
+# The awk and jq programs live in sibling files so the shell logic stays small.
 parse_hosts() {
-  awk '
-    function flush() {
-      if (n > 0) {
-        for (i = 1; i <= n; i++) {
-          printf "%s\t%s\t%s\t%s\n", aliases[i], hostname, user, port
-        }
-      }
-      n = 0; hostname = ""; user = ""; port = ""
-    }
-    { key = tolower($1) }
-    key == "host" {
-      flush()
-      for (i = 2; i <= NF; i++) {
-        if ($i ~ /[*?!]/) continue   # skip wildcard/negated patterns
-        aliases[++n] = $i
-      }
-      next
-    }
-    n == 0 { next }
-    key == "hostname" { hostname = $2; next }
-    key == "user"     { user = $2; next }
-    key == "port"     { port = $2; next }
-    END { flush() }
-  ' | jq -Rn '[inputs | split("\t")
-    | {alias: .[0], hostname: .[1], user: .[2], port: .[3]}]'
+  awk -f src/parse-hosts.awk | jq -Rn -f src/rows-to-hosts.jq
   return 0
 }
 
