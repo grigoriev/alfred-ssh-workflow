@@ -2,3 +2,4 @@ SSH.alfredworkflow
 src/update.sh
 coverage/
 sonar-coverage.xml
+.idea/
