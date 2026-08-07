@@ -31,13 +31,20 @@ EOF
 
 @test "ssh.sh: filters by the query" {
   run bash -c '. src/ssh.sh list "web"'
-  echo "$output" | jq -e '[.items[].title] == ["web"]' >/dev/null
+  echo "$output" | jq -e '[.items[].title] == ["web", "Check for updates"]' >/dev/null
 }
 
-@test "ssh.sh: no hosts shows a hint" {
+@test "ssh.sh: shows an update entry as the last item" {
+  run bash -c '. src/ssh.sh list ""'
+  echo "$output" | jq -e '.items[-1]
+    | .title == "Check for updates" and .valid == false and .autocomplete == "update"' >/dev/null
+}
+
+@test "ssh.sh: no hosts shows a hint then the update entry" {
   : > "$SSH_CONFIG"
   run bash -c '. src/ssh.sh list ""'
   [[ "$output" =~ "No SSH hosts found" ]]
+  echo "$output" | jq -e '.items[-1].title == "Check for updates"' >/dev/null
 }
 
 @test "ssh.sh: run opens an ssh session via osascript" {

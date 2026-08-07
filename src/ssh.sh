@@ -35,6 +35,15 @@ if [[ "$mode" == "run" ]]; then
   exit
 fi
 
+# Queue an always-last entry that checks for and installs workflow updates.
+# It is valid=no with an "update" autocomplete, so selecting it fills the query
+# and re-runs the filter into the update check below.
+add_update_item() {
+  add_result "" "" "Check for updates" \
+    "Check for and install a new version of this workflow" "$ICON_SSH" "no" "update"
+  return 0
+}
+
 # List mode
 # A magic "update" query checks for a new workflow version.
 if [[ "${query%% *}" == "update" ]]; then
@@ -51,10 +60,14 @@ hosts=$(ssh_hosts)
 # program lives in src/list-hosts.jq so the shell logic stays small.
 items=$(jq -c -f src/list-hosts.jq --arg q "$query" --arg icon "$ICON_SSH" <<< "$hosts")
 
-if [[ "$items" == "[]" ]] && [[ "$hosts" == "[]" ]]; then
+if [[ "$hosts" == "[]" ]]; then
+  # No hosts configured: show a hint, then the update entry.
   add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_SSH" "no"
+  add_update_item
   get_json_results
   exit
 fi
 
-printf '{"items":%s}\n' "$items"
+# Print the filtered hosts, then the update entry as the last item.
+add_update_item
+printf '{"items":%s}\n' "$(jq -c --argjson extra "$(get_json_results)" '. + $extra.items' <<< "$items")"
