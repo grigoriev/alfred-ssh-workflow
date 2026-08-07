@@ -6,6 +6,7 @@
 setup() {
   export PATH="$BATS_TEST_DIRNAME/mocks/bin:$PATH"
   export alfred_workflow_cache="$BATS_TEST_TMPDIR/cache"
+  export alfred_workflow_data="$BATS_TEST_TMPDIR/data"
   export SSH_CONFIG="$BATS_TEST_TMPDIR/config"
   cat > "$SSH_CONFIG" <<'EOF'
 Host web
@@ -45,6 +46,35 @@ EOF
   run bash -c '. src/ssh.sh list ""'
   [[ "$output" =~ "No SSH hosts found" ]]
   echo "$output" | jq -e '.items[-1].title == "Check for updates"' >/dev/null
+}
+
+@test "ssh.sh: home offers an autoupdate toggle" {
+  run bash -c '. src/ssh.sh list ""'
+  echo "$output" | jq -e '[.items[].title] | index("Autoupdate: off") != null' >/dev/null
+}
+
+@test "ssh.sh: the toggle is hidden while filtering" {
+  run bash -c '. src/ssh.sh list "web"'
+  echo "$output" | jq -e '[.items[].title] | index("Autoupdate: off") == null' >/dev/null
+}
+
+@test "ssh.sh: run autoupdate on enables it and the toggle flips" {
+  run bash -c '. src/ssh.sh run "autoupdate on"'
+  [ -f "$alfred_workflow_data/autoupdate" ]
+  run bash -c '. src/ssh.sh list ""'
+  echo "$output" | jq -e '[.items[].title] | index("Autoupdate: on") != null' >/dev/null
+}
+
+@test "ssh.sh: shows an update banner when one is pending" {
+  mkdir -p "$alfred_workflow_data"
+  : > "$alfred_workflow_data/autoupdate"
+  cat > src/update.sh <<'STUB'
+#!/bin/bash
+printf '{"items":[{"title":"Update to v9","arg":"https://example.com/SSH.alfredworkflow"}]}'
+STUB
+  run bash -c '. src/ssh.sh list ""'
+  rm -f src/update.sh
+  echo "$output" | jq -e '[.items[].title] | index("Update available") != null' >/dev/null
 }
 
 @test "ssh.sh: run opens an ssh session via osascript" {
