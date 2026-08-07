@@ -3,9 +3,13 @@ UPDATER_URL := https://github.com/grigoriev/alfred-workflow-updater/releases/lat
 SCRIPTS     := src/ssh.sh src/hosts.sh
 EXCLUDES    := '.git/*' '.github/*' '.gitignore' 'Makefile' '$(WORKFLOW)'
 
-.PHONY: all build updater verify-updater test lint clean
+.PHONY: all build updater verify-updater test lint icons clean
 
 all: build
+
+# Regenerate PNG icons from Octicons (macOS only; see .github/build-icons.sh)
+icons:
+	bash .github/build-icons.sh
 
 # Fetch the shared updater at build time (not stored in git)
 updater:

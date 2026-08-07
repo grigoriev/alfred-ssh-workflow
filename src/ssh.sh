@@ -42,7 +42,7 @@ fi
 # and re-runs the filter into the update check below.
 add_update_item() {
   add_result "" "" "Check for updates" \
-    "Check for and install a new version of this workflow" "$ICON_SSH" "no" "update"
+    "Check for and install a new version of this workflow" "$ICON_UPDATE" "no" "update"
   return 0
 }
 
@@ -50,9 +50,9 @@ add_update_item() {
 add_autoupdate_toggle() {
   [[ -z "$query" ]] || return 0
   if autoupdate_enabled; then
-    add_result "" "autoupdate off" "Autoupdate: on"  "Turn off automatic update checks" "$ICON_SSH" "yes"
+    add_result "" "autoupdate off" "Autoupdate: on"  "Turn off automatic update checks" "$ICON_UPDATE" "yes"
   else
-    add_result "" "autoupdate on"  "Autoupdate: off" "Turn on automatic update checks"  "$ICON_SSH" "yes"
+    add_result "" "autoupdate on"  "Autoupdate: off" "Turn on automatic update checks"  "$ICON_UPDATE" "yes"
   fi
   return 0
 }
@@ -71,7 +71,7 @@ hosts=$(ssh_hosts)
 # hundreds of hosts. The subtitle is "ssh user@hostname:port", each part
 # optional, falling back to the alias when there is no hostname. The jq
 # program lives in src/list-hosts.jq so the shell logic stays small.
-items=$(jq -c -f src/list-hosts.jq --arg q "$query" --arg icon "$ICON_SSH" <<< "$hosts")
+items=$(jq -c -f src/list-hosts.jq --arg q "$query" --arg icon "$ICON_HOST" <<< "$hosts")
 
 # On the home view, check for updates (throttled) and offer any pending one.
 if [[ -z "$query" ]]; then
@@ -81,7 +81,7 @@ fi
 
 if [[ "$hosts" == "[]" ]]; then
   # No hosts configured: show a hint, then the update controls.
-  add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_SSH" "no"
+  add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_HOST" "no"
   add_autoupdate_toggle
   add_update_item
   get_json_results
