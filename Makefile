@@ -1,5 +1,5 @@
 WORKFLOW    := SSH.alfredworkflow
-UPDATER_URL := https://github.com/grigoriev/alfred-workflow-updater/releases/latest/download/update.sh
+UPDATER_URL := https://github.com/grigoriev/alfred-workflow-updater/releases/latest/download/updater.tar.gz
 SCRIPTS     := src/ssh.sh src/hosts.sh
 EXCLUDES    := '.git/*' '.github/*' '.gitignore' 'Makefile' '$(WORKFLOW)'
 
@@ -9,8 +9,8 @@ all: build
 
 # Fetch the shared updater at build time (not stored in git)
 updater:
-	curl -sfL $(UPDATER_URL) -o src/update.sh
-	chmod +x src/update.sh
+	curl -sfL $(UPDATER_URL) | tar -xzf - -C src
+	chmod +x src/update.sh src/autoupdate.sh
 
 # Confirm the fetched updater runs and reports an available update
 verify-updater: updater
@@ -26,11 +26,12 @@ build: verify-updater
 	unzip -l $(WORKFLOW) | grep -q 'src/update.sh'
 	@echo "built $(WORKFLOW)"
 
-test:
+# Tests need the shared autoupdate.sh, so fetch the updater bundle first
+test: updater
 	bats tests
 
 lint:
 	shellcheck -x --severity=warning $(SCRIPTS)
 
 clean:
-	rm -f $(WORKFLOW) src/update.sh
+	rm -f $(WORKFLOW) src/update.sh src/autoupdate.sh

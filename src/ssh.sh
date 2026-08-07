@@ -3,6 +3,7 @@
 . src/workflow_handler.sh
 . src/hosts.sh
 . src/media.sh
+. src/autoupdate.sh
 
 # Single entry point behind the "ssh" keyword. Called two ways from Alfred:
 #   list mode (Script Filter): . src/ssh.sh list "{query}"
@@ -29,8 +30,9 @@ APPLESCRIPT
 # Run mode: act on the selected item
 if [[ "$mode" == "run" ]]; then
   case "$query" in
-    http://*|https://*) . src/update.sh "$query" ;;   # install a downloaded update
-    *) open_ssh "$query" ;;                            # open an SSH session
+    http://*|https://*) autoupdate_clear; . src/update.sh "$query" ;;  # install an update
+    autoupdate*) set_autoupdate "${query#autoupdate }" ;;              # toggle autoupdate
+    *) open_ssh "$query" ;;                                            # open an SSH session
   esac
   exit
 fi
@@ -41,6 +43,17 @@ fi
 add_update_item() {
   add_result "" "" "Check for updates" \
     "Check for and install a new version of this workflow" "$ICON_SSH" "no" "update"
+  return 0
+}
+
+# Queue an autoupdate on/off toggle (home view only) reflecting the state.
+add_autoupdate_toggle() {
+  [[ -z "$query" ]] || return 0
+  if autoupdate_enabled; then
+    add_result "" "autoupdate off" "Autoupdate: on"  "Turn off automatic update checks" "$ICON_SSH" "yes"
+  else
+    add_result "" "autoupdate on"  "Autoupdate: off" "Turn on automatic update checks"  "$ICON_SSH" "yes"
+  fi
   return 0
 }
 
@@ -60,14 +73,22 @@ hosts=$(ssh_hosts)
 # program lives in src/list-hosts.jq so the shell logic stays small.
 items=$(jq -c -f src/list-hosts.jq --arg q "$query" --arg icon "$ICON_SSH" <<< "$hosts")
 
+# On the home view, check for updates (throttled) and offer any pending one.
+if [[ -z "$query" ]]; then
+  autoupdate_refresh
+  autoupdate_banner
+fi
+
 if [[ "$hosts" == "[]" ]]; then
-  # No hosts configured: show a hint, then the update entry.
+  # No hosts configured: show a hint, then the update controls.
   add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_SSH" "no"
+  add_autoupdate_toggle
   add_update_item
   get_json_results
   exit
 fi
 
-# Print the filtered hosts, then the update entry as the last item.
+# Print the filtered hosts, then the update controls, keeping the check last.
+add_autoupdate_toggle
 add_update_item
 printf '{"items":%s}\n' "$(jq -c --argjson extra "$(get_json_results)" '. + $extra.items' <<< "$items")"
