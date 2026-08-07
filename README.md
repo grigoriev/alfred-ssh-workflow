@@ -21,7 +21,9 @@ plain Bash, JSON feedback, a Makefile-driven build, bats tests and self-update.
 | `ssh <query>`  | Filter by alias, hostname or user                        |
 | `ssh update`   | Check for and install a new version of the workflow      |
 
-Press ⏎ on a host to open `ssh <alias>` in a new iTerm2 window.
+Press ⏎ on a host to open `ssh <alias>` in a new iTerm2 window. The list also
+offers an **Autoupdate** toggle; when on, `ssh` checks for a new version once a
+day and shows an "Update available" item.
 
 ## How it works
 
@@ -50,9 +52,10 @@ Install the tools with `brew install bats-core shellcheck jq`. System commands
 are replaced by mocks under `tests/mocks/bin`, and the ssh config is a fixture
 pointed to by `SSH_CONFIG`, so the tests run without touching real state.
 
-The self-update logic is shared, not vendored. `make build` fetches
-[`update.sh`](https://github.com/grigoriev/alfred-workflow-updater) at build
-time and bundles it, so it is never stored in this repository.
+The update logic is shared, not vendored. `make build` fetches the
+[updater bundle](https://github.com/grigoriev/alfred-workflow-updater)
+(`update.sh` and `autoupdate.sh`) at build time and bundles it, so it is never
+stored in this repository.
 
 ## Releases
 
