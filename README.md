@@ -19,11 +19,11 @@ plain Bash, JSON feedback, a Makefile-driven build, bats tests and self-update.
 | -------------- | -------------------------------------------------------- |
 | `ssh`          | List hosts from `~/.ssh/config`, filtered as you type    |
 | `ssh <query>`  | Filter by alias, hostname or user                        |
-| `ssh update`   | Check for and install a new version of the workflow      |
+| `ssh >`        | Settings and updates: edit the SSH config, check for updates, autoupdate |
 
-Press ⏎ on a host to open `ssh <alias>` in a new iTerm2 window. The list also
-offers an **Autoupdate** toggle; when on, `ssh` checks for a new version once a
-day and shows an "Update available" item.
+Press ⏎ on a host to open `ssh <alias>` in a new iTerm2 window. Type `ssh >` for
+settings and updates. When autoupdate is on, `ssh` checks for a new version once
+a day and shows an "Update available" item.
 
 ## How it works
 
