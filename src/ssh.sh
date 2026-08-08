@@ -28,39 +28,47 @@ APPLESCRIPT
 }
 
 # Run mode: act on the selected item
+# Open the user's SSH config in a text editor, creating it if missing.
+edit_ssh_config() {
+  local file="${SSH_CONFIG:-$HOME/.ssh/config}"
+  mkdir -p "$(dirname "$file")"
+  [[ -f "$file" ]] || : > "$file"
+  open -e "$file"
+  return 0
+}
+
 if [[ "$mode" == "run" ]]; then
   case "$query" in
     http://*|https://*) autoupdate_clear; . src/update.sh "$query" ;;  # install an update
     autoupdate*) set_autoupdate "${query#autoupdate }" ;;              # toggle autoupdate
+    edit-config) edit_ssh_config ;;                                    # open ~/.ssh/config
     *) open_ssh "$query" ;;                                            # open an SSH session
   esac
   exit
 fi
 
-# Queue an always-last entry that checks for and installs workflow updates.
-# It is valid=no with an "update" autocomplete, so selecting it fills the query
-# and re-runs the filter into the update check below.
-add_update_item() {
-  add_result "" "" "Check for updates" \
-    "Check for and install a new version of this workflow" "$ICON_UPDATE" "no" "update"
-  return 0
-}
-
-# Queue an autoupdate on/off toggle (home view only) reflecting the state.
-add_autoupdate_toggle() {
-  [[ -z "$query" ]] || return 0
-  if autoupdate_enabled; then
-    add_result "" "autoupdate off" "Autoupdate: on"  "Turn off automatic update checks" "$ICON_UPDATE" "yes"
-  else
-    add_result "" "autoupdate on"  "Autoupdate: off" "Turn on automatic update checks"  "$ICON_UPDATE" "yes"
+# The ">" menu, filtered by a substring: settings and the shared update items.
+globals_menu() {
+  local filter="$1" lc
+  lc="$(printf '%s' "$filter" | tr '[:upper:]' '[:lower:]')"
+  if [[ "edit ssh config" == *"$lc"* ]]; then
+    add_result "" "edit-config" "Edit SSH config" "Open ~/.ssh/config in a text editor" "$ICON_HOST" "yes"
   fi
+  autoupdate_menu "$filter" "$ICON_UPDATE"
+  get_json_results
   return 0
 }
 
 # List mode
-# A magic "update" query checks for a new workflow version.
-if [[ "${query%% *}" == "update" ]]; then
-  . src/update.sh ""
+# ">" opens the settings and updates menu; "> update" checks for a new version.
+if [[ "$query" == ">"* ]]; then
+  sub="${query#>}"
+  sub="${sub# }"
+  if [[ "$sub" == update* ]]; then
+    . src/update.sh ""
+  else
+    globals_menu "$sub"
+  fi
   exit
 fi
 
@@ -80,15 +88,11 @@ if [[ -z "$query" ]]; then
 fi
 
 if [[ "$hosts" == "[]" ]]; then
-  # No hosts configured: show a hint, then the update controls.
-  add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config" "$ICON_HOST" "no"
-  add_autoupdate_toggle
-  add_update_item
+  # No hosts configured: show a hint. Settings and updates live under ">".
+  add_result "" "" "No SSH hosts found" "Add Host entries to ~/.ssh/config, or type > for settings" "$ICON_HOST" "no"
   get_json_results
   exit
 fi
 
-# Print the filtered hosts, then the update controls, keeping the check last.
-add_autoupdate_toggle
-add_update_item
+# Print the filtered hosts, plus any update banner queued on the home view.
 printf '{"items":%s}\n' "$(jq -c --argjson extra "$(get_json_results)" '. + $extra.items' <<< "$items")"
