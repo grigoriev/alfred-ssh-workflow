@@ -3,6 +3,7 @@
 ![CI](https://github.com/grigoriev/alfred-ssh-workflow/actions/workflows/ci.yml/badge.svg)
 [![Release](https://img.shields.io/github/v/release/grigoriev/alfred-ssh-workflow)](https://github.com/grigoriev/alfred-ssh-workflow/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/grigoriev/alfred-ssh-workflow/badge)](https://scorecard.dev/viewer/?uri=github.com/grigoriev/alfred-ssh-workflow)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=coverage)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
 
@@ -63,3 +64,10 @@ Run the **Bump Version & Release** workflow from the Actions tab and pick
 `patch`, `minor` or `major`. It bumps the version, tags it, and the release
 workflow builds `SSH.alfredworkflow` and publishes a GitHub Release with the
 asset attached. Pushing a `v*` tag by hand does the same.
+
+## Disclaimer
+
+This workflow is provided "as is", without warranty of any kind, as the LICENSE states. Use
+it at your own risk. Sergey Grigoriev is not liable for damage from its use, as far as the law
+allows. It is published free of charge, outside of any commercial offering, with no
+obligation to support it. Security reports are welcome, see SECURITY.md.
