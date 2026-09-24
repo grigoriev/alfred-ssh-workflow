@@ -66,6 +66,16 @@ Run the **Bump Version & Release** workflow from the Actions tab and pick
 workflow builds `SSH.alfredworkflow` and publishes a GitHub Release with the
 asset attached. Pushing a `v*` tag by hand does the same.
 
+## Verify
+
+Each release carries `SSH.alfredworkflow.intoto.jsonl`, a signed build
+provenance bundle. Check that this repository's release workflow built the
+download:
+
+```sh
+gh attestation verify SSH.alfredworkflow --repo grigoriev/alfred-ssh-workflow
+```
+
 ## Disclaimer
 
 This workflow is provided "as is", without warranty of any kind, as the LICENSE states. Use
