@@ -14,10 +14,15 @@ The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Stop persisting the checkout credentials where no step needs them.
 - Pass template values to scripts through environment variables.
 - Pin every action by commit SHA; Renovate keeps the digests current.
+- Pin the kcov coverage image by digest; Renovate keeps it current.
 
 ### Added
 
 - A Disclaimer section in the README.
+
+### Fixed
+
+- Run CI once per commit on a Renovate branch; a second push run blocked the automerge.
 
 Earlier releases are listed on the
 [GitHub releases page](https://github.com/grigoriev/alfred-ssh-workflow/releases).
