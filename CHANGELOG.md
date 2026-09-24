@@ -24,6 +24,7 @@ The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 
 - Run CI once per commit on a Renovate branch; a second push run blocked the automerge.
+- Upload the files to the existing release on a rerun of the release workflow.
 
 Earlier releases are listed on the
 [GitHub releases page](https://github.com/grigoriev/alfred-ssh-workflow/releases).
