@@ -16,6 +16,7 @@ The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Pin every action by commit SHA; Renovate keeps the digests current.
 - Pin the kcov coverage image by digest; Renovate keeps it current.
 - Attach a signed build provenance bundle (`*.intoto.jsonl`) to each release.
+- Renovate takes its common rules from the shared preset `github>grigoriev/renovate-config`, which also turns on OSV vulnerability alerts.
 
 ### Added
 
