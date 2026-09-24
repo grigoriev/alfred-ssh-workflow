@@ -4,7 +4,17 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Releases before 1.0.2 are listed on the
+[GitHub releases page](https://github.com/grigoriev/alfred-ssh-workflow/releases).
+
 ## [Unreleased]
+
+### Changed
+
+- The version bump moves the Unreleased entries of this changelog into a section for
+  the new version. The GitHub release takes its notes from that section.
+
+## [1.0.2] - 2026-09-24
 
 ### Security
 
@@ -26,6 +36,3 @@ The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Run CI once per commit on a Renovate branch; a second push run blocked the automerge.
 - Upload the files to the existing release on a rerun of the release workflow.
-
-Earlier releases are listed on the
-[GitHub releases page](https://github.com/grigoriev/alfred-ssh-workflow/releases).
