@@ -14,6 +14,10 @@ Releases before 1.0.2 are listed on the
 - The version bump moves the Unreleased entries of this changelog into a section for
   the new version. The GitHub release takes its notes from that section.
 
+### Security
+
+- The release verifies the provenance of the bundled updater, and the version bump pushes only `main`.
+
 ## [1.0.2] - 2026-09-24
 
 ### Security
