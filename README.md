@@ -6,7 +6,7 @@
 [![Release](https://img.shields.io/github/v/release/grigoriev/alfred-ssh-workflow)](https://github.com/grigoriev/alfred-ssh-workflow/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=grigoriev_alfred-ssh-workflow&metric=coverage)](https://sonarcloud.io/summary/new_code?id=grigoriev_alfred-ssh-workflow)
 
 An [Alfred](https://www.alfredapp.com/) workflow that lists the hosts from your
@@ -15,6 +15,22 @@ An [Alfred](https://www.alfredapp.com/) workflow that lists the hosts from your
 Built in the same style as
 [alfred-network-workflow](https://github.com/grigoriev/alfred-network-workflow):
 plain Bash, JSON feedback, a Makefile-driven build, bats tests and self-update.
+
+## Install
+
+1. Open the [latest release](https://github.com/grigoriev/alfred-ssh-workflow/releases/latest).
+2. Under **Assets**, download `SSH.alfredworkflow`.
+3. Double click the file to add it to Alfred.
+
+### Verify
+
+Each release carries `SSH.alfredworkflow.intoto.jsonl`, a signed build
+provenance bundle. Check that this repository's release workflow built the
+download:
+
+```sh
+gh attestation verify SSH.alfredworkflow --repo grigoriev/alfred-ssh-workflow
+```
 
 ## Usage
 
@@ -51,9 +67,10 @@ make build    # fetch the updater and build SSH.alfredworkflow
 make clean    # remove the build artifact and fetched files
 ```
 
-Install the tools with `brew install bats-core shellcheck jq`. System commands
-are replaced by mocks under `tests/mocks/bin`, and the ssh config is a fixture
-pointed to by `SSH_CONFIG`, so the tests run without touching real state.
+Install the tools with `brew install bats-core jq`. `make lint` runs ShellCheck
+in Docker. System commands are replaced by mocks under `tests/mocks/bin`, and
+the ssh config is a fixture pointed to by `SSH_CONFIG`, so the tests run
+without touching real state.
 
 The update logic is shared, not vendored. `make build` fetches the
 [updater bundle](https://github.com/grigoriev/alfred-workflow-updater)
@@ -67,15 +84,9 @@ Run the **Bump Version & Release** workflow from the Actions tab and pick
 workflow builds `SSH.alfredworkflow` and publishes a GitHub Release with the
 asset attached. Pushing a `v*` tag by hand does the same.
 
-## Verify
+## Contributing
 
-Each release carries `SSH.alfredworkflow.intoto.jsonl`, a signed build
-provenance bundle. Check that this repository's release workflow built the
-download:
-
-```sh
-gh attestation verify SSH.alfredworkflow --repo grigoriev/alfred-ssh-workflow
-```
+Issues and pull requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Disclaimer
 
@@ -83,3 +94,7 @@ This workflow is provided "as is", without warranty of any kind, as the LICENSE 
 it at your own risk. Sergey Grigoriev is not liable for damage from its use, as far as the law
 allows. It is published free of charge, outside of any commercial offering, with no
 obligation to support it. Security reports are welcome, see SECURITY.md.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
