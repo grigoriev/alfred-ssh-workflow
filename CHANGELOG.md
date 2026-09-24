@@ -14,6 +14,7 @@ The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Stop persisting the checkout credentials where no step needs them.
 - Pass template values to scripts through environment variables.
 - Pin every action by commit SHA; Renovate keeps the digests current.
+- Pin the kcov coverage image by digest; Renovate keeps it current.
 
 ### Added
 
